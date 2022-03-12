@@ -36,8 +36,6 @@ const userSchema = new mongoose.Schema ({
 
 userSchema.plugin(passportLocalMongoose);
 
-const secret = "Thisisourlittlesecret.";
-
 const User = new mongoose.model("User", userSchema);
 
 passport.serializeUser(User.serializeUser());
@@ -55,24 +53,20 @@ app.get("/register", function(req, res){
     res.render("register");
 });
 
-app.post("/register", function(req, res){
+////18:46
 
-    // bcrypt.genSalt(saltRounds, function(err, salt) {
-    //     bcrypt.hash(req.body.password, salt, function(err, hash) {
-    //         const newUser = new User({
-    //             email: req.body.username,
-    //             password: hash
-    //         });    
-    //         newUser.save(function(err){
-    //             if(err) {
-    //                 console.log(err);
-    //             }
-    //             else {
-    //                 res.render("secrets");
-    //             }
-    //         });
-    //     });
-    //});
+app.post("/register", function(req, res){
+    User.register({username: req.body.username}, req.body.password, function(err, user){
+        if (err) {
+            console.log(err);
+            res.redirect("/register");
+        }
+        else {
+            passport.authenticate("local")(req, res, function() {
+                res.redirect("/secrets");
+            });
+        }
+    })
 
 
 });
