@@ -119,18 +119,21 @@ app.get("/register", function(req, res){
     res.render("register");
 });
 
-app.get("/secrets", function(req, res){
-    User.find({"secret": {$ne: null}}, function(err, foundUsers){
+app.get('/secrets', (req, res) => {
+    if (req.isAuthenticated()) {
+      User.find({ secret: { $ne: null } }, function (err, foundUsers) {
         if (err) {
-            console.log(err);
+          console.log(err);
+        } else {
+          if (foundUsers) {
+            res.render('secrets', { usersWithSecrets: foundUsers });
+          }
         }
-        else {
-            if (foundUsers) {
-                res.render("secrets", {userWithSecrets: foundUsers});
-            }
-        }
-    });
-});
+      });
+    } else {
+      res.redirect('/login');
+    }
+  });
 
 app.get("/logout", function(req, res){
     req.logout();
